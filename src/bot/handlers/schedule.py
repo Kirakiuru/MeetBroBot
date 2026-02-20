@@ -4,7 +4,7 @@ from datetime import date, time
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ForceReply
+from aiogram.types import Message, CallbackQuery, ForceReply, InlineKeyboardMarkup, InlineKeyboardButton
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.bot.keyboards.schedule import (
@@ -225,7 +225,7 @@ async def on_time_entered(message: Message, state: FSMContext, session: AsyncSes
     )
 
 
-# ── Show schedule ──────────────────────────────────────
+# ── Show schedule (with per-slot delete buttons) ──────
 
 @router.callback_query(F.data == "sched_show")
 async def on_show_schedule(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
@@ -236,14 +236,83 @@ async def on_show_schedule(callback: CallbackQuery, state: FSMContext, session: 
     slots = await avail_repo.get_by_user(user.id)
     text = _format_slots(slots)
 
-    data = await state.get_data()
-    week_offset = data.get("week_offset", 0)
+    if not slots:
+        data = await state.get_data()
+        week_offset = data.get("week_offset", 0)
+        await callback.message.edit_text(
+            text + "\n\nВыбери дату:",
+            reply_markup=week_calendar_keyboard(week_offset),
+        )
+        await callback.answer()
+        return
 
+    # Build keyboard with delete buttons per slot
+    kb = _edit_schedule_keyboard(slots)
     await callback.message.edit_text(
-        text + "\n\nВыбери дату или «Готово»:",
-        reply_markup=week_calendar_keyboard(week_offset),
+        text + "\n\n🗑 Нажми чтобы удалить слот:",
+        reply_markup=kb,
     )
     await callback.answer()
+
+
+def _edit_schedule_keyboard(slots) -> InlineKeyboardMarkup:
+    """Per-slot delete buttons + back."""
+    rows = []
+    for s in sorted(slots, key=lambda x: (x.specific_date or date.min, x.start_time)):
+        if s.specific_date:
+            d = s.specific_date
+            day_name = DAYS_SHORT[d.weekday()]
+            label = f"🗑 {day_name} {d.strftime('%d.%m')} {s.start_time.strftime('%H:%M')}–{s.end_time.strftime('%H:%M')}"
+        else:
+            day_name = DAYS_SHORT[s.day_of_week] if s.day_of_week is not None else "?"
+            label = f"🗑 {day_name} (повтор) {s.start_time.strftime('%H:%M')}–{s.end_time.strftime('%H:%M')}"
+        rows.append([InlineKeyboardButton(
+            text=label, callback_data=f"sched_del:{s.id}"
+        )])
+
+    rows.append([
+        InlineKeyboardButton(text="🗑 Очистить всё", callback_data="sched_clear"),
+    ])
+    rows.append([
+        InlineKeyboardButton(text="⬅️ Назад", callback_data="sched_back"),
+    ])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+# ── Delete single slot ────────────────────────────────
+
+@router.callback_query(F.data.startswith("sched_del:"))
+async def on_delete_slot(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
+    slot_id = int(callback.data.split(":")[1])
+
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+
+    avail_repo = AvailabilityRepository(session)
+    deleted = await avail_repo.delete_by_id(slot_id, user.id)
+
+    if deleted:
+        await callback.answer("🗑 Слот удалён")
+    else:
+        await callback.answer("Слот не найден")
+
+    # Refresh the list
+    slots = await avail_repo.get_by_user(user.id)
+    text = _format_slots(slots)
+
+    if slots:
+        kb = _edit_schedule_keyboard(slots)
+        await callback.message.edit_text(
+            text + "\n\n🗑 Нажми чтобы удалить слот:",
+            reply_markup=kb,
+        )
+    else:
+        data = await state.get_data()
+        week_offset = data.get("week_offset", 0)
+        await callback.message.edit_text(
+            "📭 Расписание пусто.\n\nВыбери дату:",
+            reply_markup=week_calendar_keyboard(week_offset),
+        )
 
 
 # ── Clear all ──────────────────────────────────────────

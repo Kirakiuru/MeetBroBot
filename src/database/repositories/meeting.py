@@ -21,6 +21,7 @@ class MeetingRepository:
         chat_id: int | None = None,
         message_id: int | None = None,
         vote_deadline: datetime | None = None,
+        reminder_minutes: int | None = None,
     ) -> Meeting:
         meeting = Meeting(
             creator_id=creator_id,
@@ -31,6 +32,7 @@ class MeetingRepository:
             chat_id=chat_id,
             message_id=message_id,
             vote_deadline=vote_deadline,
+            reminder_minutes=reminder_minutes,
         )
         self.session.add(meeting)
         await self.session.commit()
@@ -56,6 +58,7 @@ class MeetingRepository:
     async def get_active_by_chat(self, chat_id: int) -> list[Meeting]:
         stmt = (
             select(Meeting)
+            .options(selectinload(Meeting.votes))
             .where(
                 Meeting.chat_id == chat_id,
                 Meeting.status == MeetingStatus.PROPOSED,

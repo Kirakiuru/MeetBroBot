@@ -14,6 +14,7 @@ from src.bot.keyboards.meeting import (
     slot_pick_keyboard,
     location_keyboard,
     deadline_keyboard,
+    reminder_keyboard,
     vote_keyboard,
     date_pick_keyboard,
     time_pick_keyboard,
@@ -76,6 +77,10 @@ def _format_meeting_preview(data: dict) -> str:
     dl = _parse_deadline(data)
     if dl:
         lines.append(f"⏰ Дедлайн: {dl.strftime('%d.%m %H:%M')}")
+    rem = data.get("reminder_minutes")
+    if rem:
+        label = f"{rem // 60} ч" if rem >= 60 else f"{rem} мин"
+        lines.append(f"🔔 Напоминание: за {label}")
     return "\n".join(lines)
 
 
@@ -402,7 +407,48 @@ async def on_deadline_picked(callback: CallbackQuery, state: FSMContext):
         await state.update_data(vote_deadline=None)
         await callback.message.edit_text("♾ <i>Без дедлайна</i>")
 
-    await _show_confirm(callback.message, state, from_inline=False)
+    await _go_to_reminder(callback.message, state)
+    await callback.answer()
+
+
+# ── Helper: go to reminder step (only if datetime set) ─
+
+async def _go_to_reminder(msg: Message, state: FSMContext):
+    data = await state.get_data()
+    if data.get("proposed_datetime"):
+        await state.set_state(MeetStates.entering_reminder)
+        await msg.answer(
+            "🔔 <b>Напоминание перед встречей?</b>",
+            reply_markup=reminder_keyboard(),
+        )
+    else:
+        # No date — skip reminder, go to confirm
+        await state.update_data(reminder_minutes=None)
+        await _show_confirm(msg, state)
+
+
+# ── Reminder picked ──────────────────────────────────
+
+@router.callback_query(F.data.startswith("meet_rem:"))
+async def on_reminder_picked(callback: CallbackQuery, state: FSMContext):
+    if not await _is_owner(callback, state):
+        return
+
+    choice = callback.data.split(":")[1]
+
+    if choice == "none":
+        await state.update_data(reminder_minutes=None)
+        await callback.message.edit_text("🔕 <i>Без напоминания</i>")
+    else:
+        minutes = int(choice)
+        await state.update_data(reminder_minutes=minutes)
+        if minutes >= 60:
+            label = f"{minutes // 60} ч"
+        else:
+            label = f"{minutes} мин"
+        await callback.message.edit_text(f"🔔 Напомню за <b>{label}</b>")
+
+    await _show_confirm(callback.message, state)
     await callback.answer()
 
 
@@ -462,6 +508,7 @@ async def on_confirm(
         location=data.get("location"),
         chat_id=callback.message.chat.id,
         vote_deadline=_parse_deadline(data),
+        reminder_minutes=data.get("reminder_minutes"),
     )
 
     creator_name = user.full_name

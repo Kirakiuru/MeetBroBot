@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, String, func
+from sqlalchemy import BigInteger, Boolean, SmallInteger, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models.base import Base
@@ -13,6 +13,18 @@ class User(Base):
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     username: Mapped[str | None] = mapped_column(String(255))
     full_name: Mapped[str] = mapped_column(String(255))
+
+    # Weekly schedule reminder settings
+    schedule_remind: Mapped[bool] = mapped_column(
+        Boolean, default=True, server_default="true"
+    )
+    schedule_remind_day: Mapped[int] = mapped_column(
+        SmallInteger, default=0, server_default="0"  # 0=Monday
+    )
+    schedule_remind_hour: Mapped[int] = mapped_column(
+        SmallInteger, default=12, server_default="12"
+    )
+
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()

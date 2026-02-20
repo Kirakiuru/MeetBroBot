@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import BigInteger, ForeignKey, Integer, String, Text, func
+from sqlalchemy import BigInteger, Boolean, ForeignKey, Integer, SmallInteger, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models.base import Base
@@ -36,6 +36,17 @@ class Meeting(Base):
 
     # Voting deadline
     vote_deadline: Mapped[datetime | None] = mapped_column(default=None)
+
+    # Reminders
+    reminder_minutes: Mapped[int | None] = mapped_column(
+        SmallInteger, default=None
+    )  # minutes before meeting
+    reminder_sent: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false"
+    )
+    deadline_reminder_sent: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false"
+    )
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

@@ -11,4 +11,5 @@ class MeetStates(StatesGroup):
     entering_datetime = State()
     entering_location = State()
     entering_deadline = State()
+    entering_reminder = State()
     confirm = State()

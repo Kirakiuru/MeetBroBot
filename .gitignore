@@ -29,6 +29,9 @@ docker-compose.override.yml
 # Alembic
 alembic/versions/__pycache__/
 
+# Test
+.pytest_cache/
+
 # Dev artifacts
 PROJECT_STATE.md
 donors/

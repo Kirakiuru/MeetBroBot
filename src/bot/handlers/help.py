@@ -9,9 +9,11 @@ HELP_TEXT_PM = """
 
 <b>Что делать в личке:</b>
 📅 /schedule — задать своё расписание (когда ты свободен)
+⚙️ /settings — настройки напоминаний
 
 <b>Что делать в группе:</b>
 🎯 /meet — создать встречу (бот подберёт время по расписаниям)
+📋 /meetings — список активных встреч
 
 <b>Как это работает:</b>
 1️⃣ Каждый заполняет /schedule здесь, в личке
@@ -31,7 +33,7 @@ HELP_TEXT_PM = """
 
 👤 @kikir_kir · 👤 @KirillFain
 
-<b>GitHub:</b> <a href="https://github.com/KirillFain/MeetBroBot">github.com/KirillFain/MeetBroBot</a>
+<b>GitHub:</b> <a href="https://github.com/Kirakiuru/MeetBroBot">github.com/Kirakiuru/MeetBroBot</a>
 
 <i>Если ты это читаешь — ты уже один из первых.
 Мы строим штуку, которую сами хотим использовать.
@@ -44,6 +46,7 @@ HELP_TEXT_GROUP = """
 
 <b>Команды:</b>
 🎯 /meet — создать встречу (бот подберёт время)
+📋 /meetings — список активных встреч
 📅 /schedule — заполнить своё расписание
 ℹ️ /help — эта справка
 
@@ -52,7 +55,7 @@ HELP_TEXT_GROUP = """
 
 ━━━━━━━━━━━━━━━━━━━
 👤 @kikir_kir · 👤 @KirillFain
-<a href="https://github.com/KirillFain/MeetBroBot">GitHub</a> · ⭐ = +1 к мотивации
+<a href="https://github.com/Kirakiuru/MeetBroBot">GitHub</a> · ⭐ = +1 к мотивации
 """.strip()
 
 

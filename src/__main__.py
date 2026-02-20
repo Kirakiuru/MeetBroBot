@@ -14,9 +14,12 @@ from src.bot.handlers.meet import router as meet_router
 from src.bot.handlers.vote import router as vote_router
 from src.bot.handlers.help import router as help_router
 from src.bot.handlers.group import router as group_router
+from src.bot.handlers.settings import router as settings_router
+from src.bot.handlers.meetings import router as meetings_router
 from src.bot.middlewares.db import DbSessionMiddleware
 from src.bot.middlewares.chat_tracker import ChatTrackerMiddleware
 from src.bot.middlewares.throttle import ThrottleMiddleware
+from src.services.scheduler import setup_scheduler
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,6 +60,8 @@ async def main():
     dp.include_router(schedule_router)
     dp.include_router(meet_router)
     dp.include_router(vote_router)
+    dp.include_router(settings_router)
+    dp.include_router(meetings_router)
     dp.include_router(help_router)
 
     # Register bot commands menu
@@ -64,10 +69,12 @@ async def main():
         BotCommand(command="start", description="Начать работу"),
         BotCommand(command="schedule", description="📅 Моё расписание"),
         BotCommand(command="meet", description="🎯 Создать встречу"),
+        BotCommand(command="settings", description="⚙️ Настройки"),
         BotCommand(command="help", description="ℹ️ Справка"),
     ]
     group_commands = [
         BotCommand(command="meet", description="🎯 Создать встречу"),
+        BotCommand(command="meetings", description="📋 Активные встречи"),
         BotCommand(command="schedule", description="📅 Моё расписание"),
         BotCommand(command="help", description="ℹ️ Справка"),
     ]
@@ -75,11 +82,17 @@ async def main():
     await bot.set_my_commands(group_commands, scope=BotCommandScopeAllGroupChats())
     logger.info("✅ Bot commands registered")
 
+    # Background scheduler (reminders, cleanup)
+    scheduler = setup_scheduler(bot, async_session)
+    scheduler.start()
+    logger.info("⏰ Scheduler started")
+
     logger.info("🚀 MeetBroBot starting...")
 
     try:
         await dp.start_polling(bot)
     finally:
+        scheduler.shutdown(wait=False)
         await bot.session.close()
 
 

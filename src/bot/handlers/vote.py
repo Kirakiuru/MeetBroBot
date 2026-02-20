@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from aiogram import Router, F, Bot
@@ -6,14 +7,18 @@ from aiogram.types import CallbackQuery
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.database.models.chat_member import ChatMember
 from src.database.models.meeting import MeetingStatus
 from src.database.models.user import User
-from src.database.models.vote import VoteChoice
+from src.database.models.vote import Vote, VoteChoice
 from src.database.repositories.meeting import MeetingRepository
 from src.database.repositories.vote import VoteRepository
 from src.database.repositories.user import UserRepository
 from src.bot.keyboards.meeting import vote_keyboard
 from src.services.meeting_card import build_card, get_votes_grouped
+from src.utils.text import safe
+
+logger = logging.getLogger(__name__)
 
 router = Router()
 
@@ -103,3 +108,67 @@ async def on_vote(callback: CallbackQuery, session: AsyncSession, bot: Bot):
         await callback.answer(f"{emoji} Голос изменён!")
     else:
         await callback.answer(f"{emoji} Голос принят!")
+
+
+# ── Ping non-voters ──────────────────────────────────
+
+@router.callback_query(F.data.startswith("meet_ping:"))
+async def on_ping_non_voters(callback: CallbackQuery, session: AsyncSession, bot: Bot):
+    meeting_id = int(callback.data.split(":")[1])
+
+    meeting_repo = MeetingRepository(session)
+    meeting = await meeting_repo.get_by_id(meeting_id)
+
+    if not meeting or meeting.status != MeetingStatus.PROPOSED:
+        await callback.answer("⏹ Встреча закрыта или не найдена")
+        return
+
+    if not meeting.chat_id:
+        await callback.answer("Работает только в группах")
+        return
+
+    # All group members
+    cm_stmt = select(ChatMember.user_id).where(ChatMember.chat_id == meeting.chat_id)
+    cm_result = await session.execute(cm_stmt)
+    all_member_ids = {row[0] for row in cm_result.all()}
+
+    # Who voted
+    vote_stmt = select(Vote.user_id).where(Vote.meeting_id == meeting.id)
+    vote_result = await session.execute(vote_stmt)
+    voted_ids = {row[0] for row in vote_result.all()}
+
+    not_voted_ids = all_member_ids - voted_ids
+
+    if not not_voted_ids:
+        await callback.answer("🎉 Все проголосовали!", show_alert=True)
+        return
+
+    # Get user info
+    user_stmt = select(User).where(User.id.in_(not_voted_ids))
+    user_result = await session.execute(user_stmt)
+    users = user_result.scalars().all()
+
+    if not users:
+        await callback.answer("Все проголосовали!")
+        return
+
+    # Build mention list — use @username if available, else name
+    mentions = []
+    for u in users:
+        if u.username:
+            mentions.append(f"@{u.username}")
+        else:
+            mentions.append(safe(u.full_name))
+
+    text = (
+        f"📢 <b>Голосование «{safe(meeting.title)}»</b>\n\n"
+        f"Ещё не проголосовали: {', '.join(mentions)}\n\n"
+        f"Нажмите ✅ ❌ или 🤔 на карточке выше ☝️"
+    )
+
+    try:
+        await bot.send_message(chat_id=meeting.chat_id, text=text)
+    except Exception:
+        logger.warning("Can't send ping to chat %d", meeting.chat_id)
+
+    await callback.answer(f"📢 Пинганул {len(mentions)} чел.")

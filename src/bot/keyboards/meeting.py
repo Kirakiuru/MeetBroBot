@@ -52,6 +52,12 @@ def vote_keyboard(meeting_id: int) -> InlineKeyboardMarkup:
             ],
             [
                 InlineKeyboardButton(
+                    text="📢 Кто не голосовал?",
+                    callback_data=f"meet_ping:{meeting_id}",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
                     text="👑 Подтвердить",
                     callback_data=f"meet_finalize:{meeting_id}",
                 ),
@@ -92,6 +98,26 @@ def deadline_keyboard() -> InlineKeyboardMarkup:
             ],
             [
                 InlineKeyboardButton(text="♾ Без дедлайна", callback_data="meet_dl:none"),
+            ],
+        ]
+    )
+
+
+# ── Meeting reminder ──────────────────────────────────
+
+def reminder_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="🔔 За 15 мин", callback_data="meet_rem:15"),
+                InlineKeyboardButton(text="🔔 За 30 мин", callback_data="meet_rem:30"),
+            ],
+            [
+                InlineKeyboardButton(text="🔔 За 1 час", callback_data="meet_rem:60"),
+                InlineKeyboardButton(text="🔔 За 3 часа", callback_data="meet_rem:180"),
+            ],
+            [
+                InlineKeyboardButton(text="🔕 Без напоминания", callback_data="meet_rem:none"),
             ],
         ]
     )

@@ -11,12 +11,14 @@ from src.database.engine import async_session
 from src.bot.handlers.start import router as start_router
 from src.bot.handlers.schedule import router as schedule_router
 from src.bot.handlers.meet import router as meet_router
+from src.bot.handlers.meet_actions import router as meet_actions_router
 from src.bot.handlers.vote import router as vote_router
 from src.bot.handlers.help import router as help_router
 from src.bot.handlers.group import router as group_router
 from src.bot.handlers.settings import router as settings_router
 from src.bot.handlers.meetings import router as meetings_router
 from src.bot.handlers.inline import router as inline_router
+from src.bot.handlers.expense import router as expense_router
 from src.bot.middlewares.db import DbSessionMiddleware
 from src.bot.middlewares.chat_tracker import ChatTrackerMiddleware
 from src.bot.middlewares.throttle import ThrottleMiddleware
@@ -72,9 +74,11 @@ async def main():
     dp.include_router(start_router)
     dp.include_router(schedule_router)
     dp.include_router(meet_router)
+    dp.include_router(meet_actions_router)
     dp.include_router(vote_router)
     dp.include_router(settings_router)
     dp.include_router(meetings_router)
+    dp.include_router(expense_router)
     dp.include_router(inline_router)
     dp.include_router(help_router)
 
@@ -84,12 +88,16 @@ async def main():
         BotCommand(command="schedule", description="📅 Моё расписание"),
         BotCommand(command="meet", description="🎯 Создать встречу"),
         BotCommand(command="settings", description="⚙️ Настройки"),
+        BotCommand(command="whatsnew", description="🆕 Что нового"),
         BotCommand(command="help", description="ℹ️ Справка"),
     ]
     group_commands = [
         BotCommand(command="meet", description="🎯 Создать встречу"),
         BotCommand(command="meetings", description="📋 Активные встречи"),
         BotCommand(command="schedule", description="📅 Моё расписание"),
+        BotCommand(command="expense", description="💰 Добавить расход"),
+        BotCommand(command="debts", description="📊 Кто кому должен"),
+        BotCommand(command="whatsnew", description="🆕 Что нового"),
         BotCommand(command="help", description="ℹ️ Справка"),
     ]
     await bot.set_my_commands(private_commands, scope=BotCommandScopeAllPrivateChats())

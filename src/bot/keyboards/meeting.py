@@ -231,6 +231,25 @@ def _day_btn(d: date, today: date, avail_count: int = 0) -> InlineKeyboardButton
     return InlineKeyboardButton(text=label, callback_data=f"meet_date:{d.isoformat()}")
 
 
+# ── Recurrence ────────────────────────────────────────
+
+def recurrence_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="📅 Каждую неделю", callback_data="meet_rec:weekly"),
+                InlineKeyboardButton(text="📅 Раз в 2 недели", callback_data="meet_rec:biweekly"),
+            ],
+            [
+                InlineKeyboardButton(text="📅 Раз в месяц", callback_data="meet_rec:monthly"),
+            ],
+            [
+                InlineKeyboardButton(text="🚫 Не повторять", callback_data="meet_rec:none"),
+            ],
+        ]
+    )
+
+
 # ── Time presets for chosen date ───────────────────────
 
 TIME_PRESETS = [

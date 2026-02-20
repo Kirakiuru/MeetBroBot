@@ -29,6 +29,11 @@ def build_card(
     if creator_name:
         lines.append(f"👤 Организатор: {safe(creator_name)}")
 
+    # Recurrence
+    if hasattr(meeting, "recurrence") and meeting.recurrence and meeting.recurrence != "none":
+        rec_labels = {"weekly": "Каждую неделю", "biweekly": "Раз в 2 недели", "monthly": "Раз в месяц"}
+        lines.append(f"🔁 {rec_labels.get(meeting.recurrence, meeting.recurrence)}")
+
     # Deadline
     if meeting.vote_deadline and not confirmed:
         lines.append(

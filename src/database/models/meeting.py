@@ -14,6 +14,14 @@ class MeetingStatus(str, enum.Enum):
     COMPLETED = "completed"
 
 
+class RecurrenceRule(str, enum.Enum):
+    """How often a meeting repeats."""
+    NONE = "none"
+    WEEKLY = "weekly"
+    BIWEEKLY = "biweekly"
+    MONTHLY = "monthly"
+
+
 class Meeting(Base):
     __tablename__ = "meetings"
 
@@ -48,6 +56,14 @@ class Meeting(Base):
         Boolean, default=False, server_default="false"
     )
 
+    # Recurrence
+    recurrence: Mapped[str] = mapped_column(
+        String(20), default=RecurrenceRule.NONE.value, server_default="none"
+    )
+    parent_meeting_id: Mapped[int | None] = mapped_column(
+        ForeignKey("meetings.id"), default=None
+    )
+
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()
@@ -56,6 +72,11 @@ class Meeting(Base):
     # Relationships
     creator: Mapped["User"] = relationship(back_populates="created_meetings")
     votes = relationship("Vote", back_populates="meeting", cascade="all, delete-orphan")
+    parent = relationship("Meeting", remote_side="Meeting.id", uselist=False)
+
+    @property
+    def is_recurring(self) -> bool:
+        return self.recurrence != RecurrenceRule.NONE.value
 
     def __repr__(self) -> str:
         return f"<Meeting {self.id} '{self.title}' [{self.status.value}]>"

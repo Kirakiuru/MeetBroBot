@@ -12,4 +12,11 @@ class MeetStates(StatesGroup):
     entering_location = State()
     entering_deadline = State()
     entering_reminder = State()
+    entering_recurrence = State()
     confirm = State()
+
+
+class ExpenseStates(StatesGroup):
+    entering_title = State()
+    entering_amount = State()
+    choosing_participants = State()

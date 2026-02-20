@@ -32,19 +32,27 @@
 |-------|----------|
 | 📅 `/schedule` | Интерактивный календарь с пресетами времени, поштучное удаление слотов |
 | 🎯 `/meet` | Пресеты названий, умный подбор дат, локация, дедлайн, напоминание |
+| 🔁 Повторяющиеся встречи | Каждую неделю / раз в 2 недели / раз в месяц — авто-создание |
 | 🧠 Smart matching | Бот находит когда все свободны (sweep-line алгоритм) |
+| 🤖 Auto-suggest | Бот сам предложит встречу, когда найдёт пересечения |
 | 🗳 Голосование | ✅ Иду / ❌ Не могу / 🤔 Не уверен — можно передумать |
 | 📢 «Кто не голосовал?» | Кнопка на карточке — пингует тех, кто ещё не ответил |
+| 💰 `/expense` | Разделение расходов — кто сколько заплатил |
+| 📊 `/debts` | Кто кому должен — оптимизация транзакций |
 | ⏰ Дедлайн | 1 час / 3 часа / до завтра / 2 дня / без дедлайна |
 | 🔔 Напоминания | За 15 мин / 30 мин / 1 ч / 3 ч до встречи + за 30 мин до дедлайна |
 | 📅 Еженедельный nudge | Бот напомнит заполнить расписание (настраивается через `/settings`) |
 | 📋 `/meetings` | Список активных встреч в группе с ссылками на карточки |
+| 🆕 `/whatsnew` | Чейнджлог прямо в боте — что нового |
 | ⚙️ `/settings` | Настройка дня/времени напоминаний, вкл/выкл |
 | 📌 Авто-пин | Карточка встречи закрепляется в чате |
+| 🤖 Inline-режим | Поделиться встречей через `@MeetMyBroBot` в любом чате |
 | 👑 Контроль | Подтвердить/отменить может только организатор |
 | 🛡 Безопасность | HTML-экранирование, rate-limiting, creator-only guards |
 | 👥 Группы | Welcome-сообщение, авто-трекинг участников |
 | 🗑 Auto-cleanup | Устаревшие слоты удаляются ежедневно в 7:00 |
+| ⚡ CI/CD | GitHub Actions — lint (Ruff) + тесты на каждый PR |
+| 🛡 Sentry | Опциональный мониторинг ошибок |
 | 🧪 Тесты | 34 теста (pytest + async SQLite), покрытие: repos, scheduling, card, scheduler |
 
 ---
@@ -99,21 +107,29 @@ python -m pytest tests/ -v
 ```
 src/
 ├── bot/
-│   ├── handlers/      # start, schedule, meet, vote, help, group, settings, meetings
-│   ├── keyboards/     # Inline-клавиатуры
-│   ├── middlewares/    # DB session, chat tracker, throttle
-│   └── states.py      # FSM states
+│   ├── handlers/        # start, schedule, meet, meet_actions, meet_helpers,
+│   │                    # vote, help, group, settings, meetings, expense, inline
+│   ├── keyboards/       # Inline-клавиатуры (meeting, expense)
+│   ├── middlewares/      # DB session, chat tracker, throttle
+│   └── states.py        # FSM states
 ├── services/
-│   ├── scheduling.py  # Sweep-line overlap + date/time summaries
-│   ├── meeting_card.py # Card builder + vote grouping
-│   └── scheduler.py   # APScheduler: reminders, cleanup, weekly nudge
+│   ├── scheduling.py    # Sweep-line overlap + date/time summaries
+│   ├── meeting_card.py  # Card builder + vote grouping
+│   ├── debt_calculator.py # Оптимизация долгов
+│   └── scheduler/       # APScheduler jobs:
+│       ├── reminders.py     # Напоминания перед встречей
+│       ├── deadlines.py     # Напоминания о дедлайне
+│       ├── weekly_nudge.py  # Еженедельный nudge
+│       ├── recurring.py     # Авто-создание повторяющихся встреч
+│       ├── auto_suggest.py  # Авто-подбор встреч
+│       └── cleanup.py       # Очистка устаревших слотов
 ├── database/
-│   ├── models/        # User, Meeting, Vote, Availability, ChatMember
-│   └── repositories/  # Data access layer
+│   ├── models/          # User, Meeting, Vote, Availability, ChatMember, Expense
+│   └── repositories/    # Data access layer
 ├── core/
-│   └── config.py      # pydantic-settings
+│   └── config.py        # pydantic-settings
 └── utils/
-    └── text.py        # HTML escaping
+    └── text.py          # HTML escaping
 ```
 
 ### Tech Stack
@@ -133,13 +149,10 @@ src/
 
 ## Planned
 
-- 📆 Google Calendar sync
-- 🔁 Повторяющиеся встречи ("каждую пятницу бар")
-- 🤖 Inline-режим (`@MeetBroBot бар`)
-- ⚡ CI/CD (GitHub Actions)
+- 📸 Фото/заметки после встречи (мини-дневник тусовок)
+- 📍 2GIS/Яндекс.Карты — поиск мест при создании встречи
 - 🌐 Webhook mode для прода
-- 📍 Карта с точками встречи
-- 🛒 Список покупок (кто что несёт)
+- 🌐 Telegram Mini App (визуальный календарь, настройки)
 
 ---
 

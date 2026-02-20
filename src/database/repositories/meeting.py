@@ -22,6 +22,8 @@ class MeetingRepository:
         message_id: int | None = None,
         vote_deadline: datetime | None = None,
         reminder_minutes: int | None = None,
+        recurrence: str = "none",
+        parent_meeting_id: int | None = None,
     ) -> Meeting:
         meeting = Meeting(
             creator_id=creator_id,
@@ -33,6 +35,8 @@ class MeetingRepository:
             message_id=message_id,
             vote_deadline=vote_deadline,
             reminder_minutes=reminder_minutes,
+            recurrence=recurrence,
+            parent_meeting_id=parent_meeting_id,
         )
         self.session.add(meeting)
         await self.session.commit()
@@ -67,3 +71,25 @@ class MeetingRepository:
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_recurring_needing_spawn(self) -> list[Meeting]:
+        """Get confirmed/completed recurring meetings whose next occurrence should be created."""
+        stmt = (
+            select(Meeting)
+            .where(
+                Meeting.recurrence != "none",
+                Meeting.status.in_([MeetingStatus.CONFIRMED, MeetingStatus.COMPLETED]),
+                Meeting.proposed_datetime.isnot(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def child_exists(self, parent_id: int, proposed_dt: datetime) -> bool:
+        """Check if a child meeting already exists for the given parent + datetime."""
+        stmt = select(Meeting.id).where(
+            Meeting.parent_meeting_id == parent_id,
+            Meeting.proposed_datetime == proposed_dt,
+        ).limit(1)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none() is not None

@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     # Redis (None = MemoryStorage fallback)
     redis_url: str | None = None
 
+    # Sentry (optional)
+    sentry_dsn: str | None = None
+
     @property
     def database_url(self) -> str:
         return (

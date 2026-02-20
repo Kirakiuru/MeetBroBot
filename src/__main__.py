@@ -16,6 +16,7 @@ from src.bot.handlers.help import router as help_router
 from src.bot.handlers.group import router as group_router
 from src.bot.handlers.settings import router as settings_router
 from src.bot.handlers.meetings import router as meetings_router
+from src.bot.handlers.inline import router as inline_router
 from src.bot.middlewares.db import DbSessionMiddleware
 from src.bot.middlewares.chat_tracker import ChatTrackerMiddleware
 from src.bot.middlewares.throttle import ThrottleMiddleware
@@ -26,6 +27,17 @@ logging.basicConfig(
     format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+# Sentry (optional — only if SENTRY_DSN is set)
+if settings.sentry_dsn:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        traces_sample_rate=0.2,
+        environment="production",
+    )
+    logger.info("🛡 Sentry initialized")
 
 
 async def main():
@@ -53,6 +65,7 @@ async def main():
     dp.update.middleware(DbSessionMiddleware(session_factory=async_session))
     dp.message.middleware(ChatTrackerMiddleware())
     dp.callback_query.middleware(ChatTrackerMiddleware())
+    dp.inline_query.middleware(ThrottleMiddleware(rate=5, period=10))
 
     # Routers
     dp.include_router(group_router)  # my_chat_member events
@@ -62,6 +75,7 @@ async def main():
     dp.include_router(vote_router)
     dp.include_router(settings_router)
     dp.include_router(meetings_router)
+    dp.include_router(inline_router)
     dp.include_router(help_router)
 
     # Register bot commands menu

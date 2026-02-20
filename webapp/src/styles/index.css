@@ -1,0 +1,466 @@
+:root {
+  --tg-bg: var(--tg-theme-bg-color, #ffffff);
+  --tg-text: var(--tg-theme-text-color, #000000);
+  --tg-hint: var(--tg-theme-hint-color, #999999);
+  --tg-link: var(--tg-theme-link-color, #2481cc);
+  --tg-btn: var(--tg-theme-button-color, #2481cc);
+  --tg-btn-text: var(--tg-theme-button-text-color, #ffffff);
+  --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  --tg-header-bg: var(--tg-theme-header-bg-color, #2481cc);
+  --tg-section-bg: var(--tg-theme-section-bg-color, #ffffff);
+  --tg-accent: var(--tg-theme-accent-text-color, var(--tg-link));
+  --tg-subtitle: var(--tg-theme-subtitle-text-color, var(--tg-hint));
+  --tg-destructive: var(--tg-theme-destructive-text-color, #cc2424);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--tg-bg);
+  color: var(--tg-text);
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Navigation tabs ───────────────────────── */
+
+.nav-tabs {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tg-section-bg);
+  border-top: 0.5px solid var(--tg-hint);
+  padding: 6px 0 env(safe-area-inset-bottom, 8px);
+  z-index: 100;
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  color: var(--tg-hint);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.nav-tab.active {
+  color: var(--tg-btn);
+}
+
+.nav-tab .icon {
+  font-size: 22px;
+}
+
+/* ── Page container ────────────────────────── */
+
+.page {
+  padding: 16px;
+  padding-bottom: 80px; /* space for nav */
+  min-height: 100vh;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* ── Card ──────────────────────────────────── */
+
+.card {
+  background: var(--tg-section-bg);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: var(--tg-hint);
+}
+
+/* ── Calendar grid ─────────────────────────── */
+
+.calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 50px repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.calendar-header-cell {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tg-hint);
+  padding: 6px 0;
+}
+
+.calendar-row {
+  display: grid;
+  grid-template-columns: 50px repeat(7, 1fr);
+  gap: 2px;
+}
+
+.calendar-time {
+  font-size: 11px;
+  color: var(--tg-hint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+}
+
+.calendar-cell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--tg-secondary-bg);
+  cursor: pointer;
+  transition: all 0.12s;
+  min-height: 32px;
+  position: relative;
+}
+
+.calendar-cell:active {
+  transform: scale(0.92);
+}
+
+.calendar-cell.active {
+  background: var(--tg-btn);
+}
+
+.calendar-cell.active::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tg-btn-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Week navigation ───────────────────────── */
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.week-nav-btn {
+  background: var(--tg-secondary-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  color: var(--tg-text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.week-nav-btn:active {
+  opacity: 0.7;
+}
+
+.week-nav-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ── Buttons ───────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn:active {
+  opacity: 0.7;
+}
+
+.btn-primary {
+  background: var(--tg-btn);
+  color: var(--tg-btn-text);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--tg-btn);
+  border: 1.5px solid var(--tg-btn);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--tg-destructive);
+  border: 1.5px solid var(--tg-destructive);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ── Meeting card ──────────────────────────── */
+
+.meeting-card {
+  background: var(--tg-section-bg);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.meeting-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.meeting-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--tg-hint);
+  margin-bottom: 10px;
+}
+
+.vote-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.vote-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--tg-secondary-bg);
+  background: var(--tg-secondary-bg);
+  color: var(--tg-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.vote-btn:active {
+  transform: scale(0.95);
+}
+
+.vote-btn.selected {
+  border-color: var(--tg-btn);
+  background: var(--tg-btn);
+  color: var(--tg-btn-text);
+}
+
+.vote-btn.selected-maybe {
+  border-color: #f5a623;
+  background: #f5a623;
+  color: #fff;
+}
+
+.vote-btn.selected-no {
+  border-color: var(--tg-destructive);
+  background: var(--tg-destructive);
+  color: #fff;
+}
+
+.votes-summary {
+  font-size: 13px;
+  color: var(--tg-hint);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+/* ── Settings ──────────────────────────────── */
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--tg-secondary-bg);
+}
+
+.settings-label {
+  font-size: 15px;
+}
+
+.toggle {
+  width: 50px;
+  height: 30px;
+  border-radius: 15px;
+  border: none;
+  background: var(--tg-secondary-bg);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle.on {
+  background: var(--tg-btn);
+}
+
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+
+.toggle.on::after {
+  transform: translateX(20px);
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  border: 1.5px solid var(--tg-secondary-bg);
+  background: var(--tg-secondary-bg);
+  color: var(--tg-text);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.chip.active {
+  border-color: var(--tg-btn);
+  background: var(--tg-btn);
+  color: var(--tg-btn-text);
+}
+
+/* ── Slot list ─────────────────────────────── */
+
+.slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.slot-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--tg-secondary-bg);
+  border-radius: var(--radius-sm);
+}
+
+.slot-info {
+  font-size: 14px;
+}
+
+.slot-delete {
+  background: none;
+  border: none;
+  color: var(--tg-destructive);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+/* ── Empty state ───────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--tg-hint);
+}
+
+.empty-state .icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Loader ────────────────────────────────── */
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--tg-secondary-bg);
+  border-top-color: var(--tg-btn);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

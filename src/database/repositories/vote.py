@@ -42,3 +42,11 @@ class VoteRepository:
         stmt = select(Vote).where(Vote.meeting_id == meeting_id)
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_user_vote(self, meeting_id: int, user_id: int) -> Vote | None:
+        stmt = select(Vote).where(
+            Vote.meeting_id == meeting_id,
+            Vote.user_id == user_id,
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()

@@ -9,6 +9,33 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    # No ports exposed — only accessible via nginx
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+
   postgres:
     image: postgres:16-alpine
     environment:
@@ -22,7 +49,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    # No ports exposed — only accessible from bot container
 
   redis:
     image: redis:7-alpine
@@ -31,7 +57,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    # No ports exposed — only accessible from bot container
 
 volumes:
   pgdata:

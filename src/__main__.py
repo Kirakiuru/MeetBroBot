@@ -16,6 +16,7 @@ from src.bot.handlers.help import router as help_router
 from src.bot.handlers.group import router as group_router
 from src.bot.handlers.settings import router as settings_router
 from src.bot.handlers.meetings import router as meetings_router
+from src.bot.handlers.webapp import router as webapp_router
 from src.bot.middlewares.db import DbSessionMiddleware
 from src.bot.middlewares.chat_tracker import ChatTrackerMiddleware
 from src.bot.middlewares.throttle import ThrottleMiddleware
@@ -62,6 +63,7 @@ async def main():
     dp.include_router(vote_router)
     dp.include_router(settings_router)
     dp.include_router(meetings_router)
+    dp.include_router(webapp_router)
     dp.include_router(help_router)
 
     # Register bot commands menu
@@ -69,6 +71,7 @@ async def main():
         BotCommand(command="start", description="Начать работу"),
         BotCommand(command="schedule", description="📅 Моё расписание"),
         BotCommand(command="meet", description="🎯 Создать встречу"),
+        BotCommand(command="app", description="📱 Mini App"),
         BotCommand(command="settings", description="⚙️ Настройки"),
         BotCommand(command="help", description="ℹ️ Справка"),
     ]
@@ -76,6 +79,7 @@ async def main():
         BotCommand(command="meet", description="🎯 Создать встречу"),
         BotCommand(command="meetings", description="📋 Активные встречи"),
         BotCommand(command="schedule", description="📅 Моё расписание"),
+        BotCommand(command="app", description="📱 Mini App"),
         BotCommand(command="help", description="ℹ️ Справка"),
     ]
     await bot.set_my_commands(private_commands, scope=BotCommandScopeAllPrivateChats())

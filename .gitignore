@@ -35,3 +35,10 @@ alembic/versions/__pycache__/
 # Dev artifacts
 PROJECT_STATE.md
 donors/
+
+# WebApp
+webapp/node_modules/
+webapp/dist/
+
+# SSL certs
+certbot/

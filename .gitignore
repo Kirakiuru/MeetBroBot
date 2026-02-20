@@ -32,6 +32,10 @@ alembic/versions/__pycache__/
 # Test
 .pytest_cache/
 
+# Node / Webapp
+node_modules/
+webapp/dist/
+
 # Dev artifacts
 PROJECT_STATE.md
 donors/

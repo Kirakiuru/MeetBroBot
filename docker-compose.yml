@@ -8,6 +8,18 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 200M
 
   postgres:
     image: postgres:16-alpine
@@ -22,6 +34,12 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 200M
     # No ports exposed — only accessible from bot container
 
   redis:
@@ -31,6 +49,12 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 50M
     # No ports exposed — only accessible from bot container
 
 volumes:

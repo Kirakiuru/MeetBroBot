@@ -15,11 +15,8 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: 200M
+    mem_limit: 200m
+    cpus: 0.5
 
   postgres:
     image: postgres:16-alpine
@@ -36,11 +33,8 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: 200M
+    mem_limit: 200m
+    cpus: 0.5
     # No ports exposed — only accessible from bot container
 
   redis:
@@ -51,11 +45,8 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "0.25"
-          memory: 50M
+    mem_limit: 50m
+    cpus: 0.25
     # No ports exposed — only accessible from bot container
 
 volumes:

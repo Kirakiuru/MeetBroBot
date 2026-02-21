@@ -23,14 +23,15 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    env_file: .env
     environment:
-      POSTGRES_USER: meetbro
-      POSTGRES_PASSWORD: meetbro
-      POSTGRES_DB: meetbro
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U meetbro"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
       timeout: 3s
       retries: 5

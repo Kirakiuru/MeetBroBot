@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.database.models.expense import Expense, ExpenseShare
+from src.database.models.expense import Expense
 from src.database.models.user import User
 
 

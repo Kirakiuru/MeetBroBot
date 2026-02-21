@@ -1,7 +1,6 @@
 """Tests for repository layer (CRUD operations)."""
 
-import pytest
-from datetime import date, time, datetime, timedelta
+from datetime import date, time, datetime
 
 from src.database.repositories.user import UserRepository
 from src.database.repositories.availability import AvailabilityRepository
@@ -178,10 +177,10 @@ class TestMeetingRepository:
         user = await user_repo.create(telegram_id=202, username="m2", full_name="M2")
 
         meeting_repo = MeetingRepository(session)
-        m1 = await meeting_repo.create(
+        await meeting_repo.create(
             creator_id=user.id, title="Active", chat_id=-100123
         )
-        m2 = await meeting_repo.create(
+        await meeting_repo.create(
             creator_id=user.id, title="Also Active", chat_id=-100123
         )
         # Confirmed — should NOT appear

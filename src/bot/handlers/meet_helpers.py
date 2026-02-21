@@ -129,7 +129,7 @@ async def go_to_reminder(msg: Message, state: FSMContext):
         )
     else:
         await state.update_data(reminder_minutes=None)
-        await show_confirm(msg, state)
+        await go_to_recurrence(msg, state)
 
 
 async def go_to_recurrence(msg: Message, state: FSMContext):

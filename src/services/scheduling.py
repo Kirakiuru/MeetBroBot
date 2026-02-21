@@ -1,4 +1,4 @@
-from datetime import date, time, timedelta, datetime
+from datetime import date, time, timedelta
 from collections import Counter
 
 from sqlalchemy import select
@@ -182,7 +182,6 @@ class SchedulingService:
         active: Counter = Counter()
         results: list[tuple[int, int, list[str]]] = []
         current_start = None
-        current_names: set[str] = set()
 
         for minute, delta, name in events:
             # If we're tracking an overlap and the time advances

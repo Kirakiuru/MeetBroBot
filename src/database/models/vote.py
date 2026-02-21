@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 import enum
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models.base import Base
+
+if TYPE_CHECKING:
+    from src.database.models.meeting import Meeting  # noqa: F401
+    from src.database.models.user import User  # noqa: F401
 
 
 class VoteChoice(str, enum.Enum):

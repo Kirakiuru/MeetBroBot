@@ -165,7 +165,6 @@ async def _go_to_participants(
     cm_repo = ChatMemberRepository(session)
     user_ids = await cm_repo.get_user_ids_in_chat(chat_id)
 
-    user_repo = UserRepository(session)
     users = []
     for uid in user_ids:
         from sqlalchemy import select
@@ -260,7 +259,7 @@ async def on_exp_split_done(callback: CallbackQuery, state: FSMContext, session:
         return
 
     expense_repo = ExpenseRepository(session)
-    expense = await expense_repo.create(
+    await expense_repo.create(
         chat_id=data["chat_id"],
         paid_by_id=data["paid_by_id"],
         title=data["title"],

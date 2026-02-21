@@ -3,14 +3,13 @@
 import logging
 from hashlib import md5
 
-from aiogram import Router, Bot
+from aiogram import Router
 from aiogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
     InputTextMessageContent,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
-    ChosenInlineResult,
 )
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,7 +19,6 @@ from src.database.models.user import User
 from src.database.models.chat_member import ChatMember
 from src.database.repositories.user import UserRepository
 from src.services.meeting_card import build_card, get_votes_grouped
-from src.utils.text import safe
 
 logger = logging.getLogger(__name__)
 router = Router()

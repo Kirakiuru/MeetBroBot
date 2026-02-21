@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 from datetime import date, datetime, time
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models.base import Base
+
+if TYPE_CHECKING:
+    from src.database.models.user import User  # noqa: F401
 
 
 class Availability(Base):

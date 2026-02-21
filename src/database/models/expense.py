@@ -1,12 +1,18 @@
 """Expense splitting models."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
-from sqlalchemy import BigInteger, ForeignKey, Numeric, String, Text, func
+from sqlalchemy import BigInteger, ForeignKey, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models.base import Base
+
+if TYPE_CHECKING:
+    from src.database.models.user import User  # noqa: F401
 
 
 class Expense(Base):

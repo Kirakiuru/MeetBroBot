@@ -1,7 +1,5 @@
 """Shared logic for building meeting cards and vote summaries."""
 
-from datetime import datetime
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

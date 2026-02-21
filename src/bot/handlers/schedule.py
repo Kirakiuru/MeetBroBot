@@ -11,7 +11,6 @@ from src.bot.keyboards.schedule import (
     DAYS_SHORT,
     week_calendar_keyboard,
     time_presets_keyboard,
-    back_to_calendar_keyboard,
 )
 from src.bot.states import ScheduleStates
 from src.database.repositories.availability import AvailabilityRepository

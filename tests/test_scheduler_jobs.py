@@ -1,14 +1,13 @@
 """Tests for scheduler background jobs (cleanup, reminder logic)."""
 
 from datetime import date, time, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from src.database.models.availability import Availability
-from src.database.models.meeting import Meeting, MeetingStatus
-from src.database.models.vote import Vote, VoteChoice
+from src.database.models.meeting import Meeting
+from src.database.models.vote import VoteChoice
 from src.database.repositories.user import UserRepository
 from src.database.repositories.availability import AvailabilityRepository
 from src.database.repositories.meeting import MeetingRepository
@@ -95,7 +94,7 @@ class TestMeetingReminders:
 
         meeting_repo = MeetingRepository(session)
         # Meeting in 3 hours, reminder 60 min → not yet
-        meeting = await meeting_repo.create(
+        await meeting_repo.create(
             creator_id=user.id,
             title="Later",
             proposed_datetime=datetime.now() + timedelta(hours=3),
